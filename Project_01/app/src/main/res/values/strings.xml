@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="sort_by_popular_text">Most popular</string>
+    <string name="sort_by_rating_text">Top rated</string>
+    <string name="sort_by_popular">popular</string>
+    <string name="sort_by_rating">top_rated</string>
+    <string name="error_message">Error loading movie data</string>
+</resources>
