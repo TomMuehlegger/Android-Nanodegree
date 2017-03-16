@@ -2,6 +2,8 @@ package com.example.android.project_01.utilities;
 
 import android.net.Uri;
 
+import com.example.android.project_01.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -14,8 +16,6 @@ import java.util.Scanner;
  */
 public final class NetworkUtils {
 
-    // TODO: Replace with your own API key
-    private static final String TMDB_API_KEY = "";
     // URL to the movie database api
     private static final String TMDB_API_URL = "http://api.themoviedb.org/3/movie/";
 
@@ -28,9 +28,10 @@ public final class NetworkUtils {
      * @return URL
      */
     public static URL buildUrl(String sortByString) {
+        // The movie db api key is stored in the gradle.properties file
         Uri builtUri = Uri.parse(TMDB_API_URL).buildUpon()
                 .appendPath(sortByString)
-                .appendQueryParameter(API_KEY_PARAM, TMDB_API_KEY)
+                .appendQueryParameter(API_KEY_PARAM, BuildConfig.THE_MOVIE_DB_API_TOKEN)
                 .build();
 
         URL url = null;

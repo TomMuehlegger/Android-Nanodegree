@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="loading_indicator_size">42dp</dimen>
+    <dimen name="title_bar_height">100dp</dimen>
+    <dimen name="zero_size">0dp</dimen>
+    <dimen name="text_sz_large">20sp</dimen>
+    <dimen name="text_sz_extra_large">30sp</dimen>
+    <dimen name="padding_small">5dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">20dp</dimen>
+</resources>

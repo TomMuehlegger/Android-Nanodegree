@@ -1,64 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MovieDetailActivity"
-    android:weightSum="1">
-
-
-    <TextView
-        android:id="@+id/tv_movie_title"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:padding="16dp"
-        android:textColor="@color/colorPrimary"
-        android:textSize="30sp"
-        android:background="@color/colorAccent"
-        android:gravity="center_vertical" />
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        tools:context=".MovieDetailActivity"
+        android:weightSum="1">
 
-        <ImageView
-            android:id="@+id/iv_movie_poster"
-            android:layout_width="0dp"
-            android:layout_weight="0.4"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:adjustViewBounds="true" />
+        <TextView
+            android:id="@+id/tv_movie_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/title_bar_height"
+            android:padding="@dimen/padding_medium"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_sz_extra_large"
+            android:background="@color/colorAccent"
+            android:gravity="center_vertical" />
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.6"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tv_movie_release_date"
-                android:layout_width="wrap_content"
+            <ImageView
+                android:id="@+id/iv_movie_poster"
+                android:layout_width="@dimen/zero_size"
+                android:layout_weight="0.4"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:textSize="20sp" />
+                android:padding="@dimen/padding_large"
+                android:adjustViewBounds="true" />
 
-            <TextView
-                android:id="@+id/tv_movie_rating"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="@dimen/zero_size"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:textSize="20sp" />
+                android:layout_weight="0.6"
+                android:orientation="vertical"
+                android:padding="@dimen/padding_large">
+
+                <TextView
+                    android:id="@+id/tv_movie_release_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/padding_small"
+                    android:textSize="@dimen/text_sz_large" />
+
+                <TextView
+                    android:id="@+id/tv_movie_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/padding_small"
+                    android:textSize="@dimen/text_sz_large" />
+            </LinearLayout>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_movie_overview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_medium"
+            android:textSize="@dimen/text_sz_large" />
+
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv_movie_overview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textSize="20sp" />
-
-</LinearLayout>
+</ScrollView>

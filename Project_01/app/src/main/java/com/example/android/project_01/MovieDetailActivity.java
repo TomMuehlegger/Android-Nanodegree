@@ -26,20 +26,23 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         // Get movie data from the intent
         Intent intent = getIntent();
-        final Movie movie = intent.getParcelableExtra(MOVIE_EXTRA_NAME);
 
-        // Get the different views to display detailed movie data
-        TextView movieTitle = (TextView) findViewById(R.id.tv_movie_title);
-        ImageView moviePoster = (ImageView) findViewById(R.id.iv_movie_poster);
-        TextView movieReleaseDate = (TextView) findViewById(R.id.tv_movie_release_date);
-        TextView movieRating = (TextView) findViewById(R.id.tv_movie_rating);
-        TextView movieOverview = (TextView) findViewById(R.id.tv_movie_overview);
+        if ( (intent != null) && (intent.hasExtra(MOVIE_EXTRA_NAME)) ) {
+            final Movie movie = intent.getParcelableExtra(MOVIE_EXTRA_NAME);
 
-        // Set the movie details to the views
-        movieTitle.setText(movie.getOriginalTitle());
-        Picasso.with(moviePoster.getContext()).load(movie.getPosterUrl()).into(moviePoster);
-        movieReleaseDate.setText(new SimpleDateFormat(RELEASE_DATE_FORMAT).format(movie.getReleaseDate()));
-        movieRating.setText(Double.toString(movie.getUserRating()) + " / 10");
-        movieOverview.setText(movie.getOverview());
+            // Get the different views to display detailed movie data
+            TextView movieTitle = (TextView) findViewById(R.id.tv_movie_title);
+            ImageView moviePoster = (ImageView) findViewById(R.id.iv_movie_poster);
+            TextView movieReleaseDate = (TextView) findViewById(R.id.tv_movie_release_date);
+            TextView movieRating = (TextView) findViewById(R.id.tv_movie_rating);
+            TextView movieOverview = (TextView) findViewById(R.id.tv_movie_overview);
+
+            // Set the movie details to the views
+            movieTitle.setText(movie.getOriginalTitle());
+            Picasso.with(moviePoster.getContext()).load(movie.getPosterUrl()).into(moviePoster);
+            movieReleaseDate.setText(new SimpleDateFormat(RELEASE_DATE_FORMAT).format(movie.getReleaseDate()));
+            movieRating.setText(Double.toString(movie.getUserRating()) + " / 10");
+            movieOverview.setText(movie.getOverview());
+        }
     }
 }
