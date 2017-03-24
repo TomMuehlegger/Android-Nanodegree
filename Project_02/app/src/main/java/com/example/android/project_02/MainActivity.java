@@ -1,5 +1,7 @@
 package com.example.android.project_02;
 
+import android.content.ContentResolver;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,11 +15,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.project_02.data.Movie;
+import com.example.android.project_02.data.MovieContract;
 import com.example.android.project_02.utilities.MovieJsonUtils;
 import com.example.android.project_02.utilities.NetworkUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -86,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
             loadMovieData(getString(R.string.sort_by_rating));
             return true;
         }
+        else if (id == R.id.action_show_favorites) {
+            displayMovieData(getFavoriteMovies());
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -101,6 +109,58 @@ public class MainActivity extends AppCompatActivity {
         mMovieOverview.setVisibility(View.INVISIBLE);
         // Show the error message
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
+    }
+
+    private List<Movie> getFavoriteMovies() {
+        List<Movie> movies = new ArrayList<>();
+
+        final ContentResolver resolver = getContentResolver();
+        String[] projectionColumns = {  MovieContract.MovieEntry._ID,
+                                        MovieContract.MovieEntry.COLUMN_TITLE,
+                                        MovieContract.MovieEntry.COLUMN_OVERVIEW,
+                                        MovieContract.MovieEntry.COLUMN_POSTER_URL,
+                                        MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+                                        MovieContract.MovieEntry.COLUMN_USER_RATING
+        };
+
+        Cursor cursor = resolver.query(MovieContract.MovieEntry.CONTENT_URI,
+                projectionColumns,
+                null,
+                null,
+                null);
+
+        // Iterate over all favorite movies
+        while (cursor.moveToNext()) {
+            // Set the toggle button to checked
+            int id = cursor.getInt(0);
+            String title = cursor.getString(1);
+            String overview = cursor.getString(2);
+            String posterUrl = cursor.getString(3);
+            Date releaseDate = new Date(cursor.getLong(4));
+            double userRating = cursor.getDouble(5);
+
+            Movie movie = new Movie(id, title, posterUrl, overview, userRating, releaseDate);
+            movies.add(movie);
+        }
+
+        return movies;
+    }
+
+    /**
+     * Method to display the movie data in the recycler view
+     *
+     * @param movieData - movie list to display
+     */
+    private void displayMovieData(List<Movie> movieData) {
+        // If the provided movie data is valid
+        if (movieData != null) {
+            // Show the movie data view and update the recycle view adapter
+            showMovieDataView();
+            mMovieAdapter.updateMovieData(movieData);
+        } else {
+            // Otherwise show the error message
+            showErrorMessage();
+        }
     }
 
     public class FetchMovieDataTask extends AsyncTask<String, Void, List<Movie>> {
@@ -143,15 +203,9 @@ public class MainActivity extends AppCompatActivity {
             // Hide the loading indicator
             mLoadingIndicator.setVisibility(View.INVISIBLE);
 
-            // If a valid movieData received
-            if (movieData != null) {
-                // Show the movie data view and update the recycle view adapter
-                showMovieDataView();
-                mMovieAdapter.updateMovieData(movieData);
-            } else {
-                // Otherwise show the error message
-                showErrorMessage();
-            }
+            // Display the movie data in the recylcer view
+            displayMovieData(movieData);
         }
     }
+
 }

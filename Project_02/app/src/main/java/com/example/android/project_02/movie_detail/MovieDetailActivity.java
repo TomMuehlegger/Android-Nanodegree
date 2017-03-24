@@ -1,18 +1,27 @@
 package com.example.android.project_02.movie_detail;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.example.android.project_02.R;
 import com.example.android.project_02.data.Movie;
+import com.example.android.project_02.data.MovieContract;
 import com.example.android.project_02.data.Review;
 import com.example.android.project_02.data.Trailer;
 import com.example.android.project_02.utilities.MovieJsonUtils;
@@ -58,6 +67,59 @@ public class MovieDetailActivity extends AppCompatActivity {
             ImageView moviePoster = (ImageView) findViewById(R.id.iv_movie_poster);
             TextView movieReleaseDate = (TextView) findViewById(R.id.tv_movie_release_date);
             TextView movieRating = (TextView) findViewById(R.id.tv_movie_rating);
+            ToggleButton markAsFavorite = (ToggleButton) findViewById(R.id.tb_mark_movie_as_favorite);
+
+            final ContentResolver resolver = getContentResolver();
+            String[] projectionColumns = {MovieContract.MovieEntry._ID};
+
+            Cursor cursor = resolver.query(MovieContract.MovieEntry.buildMovieUriWithId(movie.getId()),
+                    projectionColumns,
+                    null,
+                    null,
+                    null);
+
+            // Set the text off from the mark as favorite toggle button
+            markAsFavorite.setTextOn(getString(R.string.remove_from_favorites));
+            // Set the text on from the mark as favorite toggle button
+            markAsFavorite.setTextOff(getString(R.string.mark_as_favorite));
+
+            // The actual movie is already a favorite movie
+            if (cursor.moveToFirst()) {
+                // Set the toggle button to checked
+                markAsFavorite.setChecked(true);
+                // Update text of button to remove the movie from favorites
+                markAsFavorite.setText(getString(R.string.remove_from_favorites));
+            }
+            else {
+                // Set the toggle button to unchecked
+                markAsFavorite.setChecked(false);
+                // Update text of button to mark movie as favorite
+                markAsFavorite.setText(getString(R.string.mark_as_favorite));
+            }
+
+            markAsFavorite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        // Add movie to local favorites
+                        ContentValues movieValues = new ContentValues();
+                        movieValues.put(MovieContract.MovieEntry._ID, movie.getId());
+                        movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.getOriginalTitle());
+                        movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+                        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_URL, movie.getPosterUrl());
+                        movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate().getTime());
+                        movieValues.put(MovieContract.MovieEntry.COLUMN_USER_RATING, movie.getUserRating());
+                        resolver.insert(MovieContract.MovieEntry.CONTENT_URI, movieValues);
+                    }
+                    else {
+                        // Remove movie from local favorites
+                        resolver.delete(MovieContract.MovieEntry.buildMovieUriWithId(movie.getId()),
+                                null,
+                                null);
+                    }
+                }
+            });
+
             TextView movieOverview = (TextView) findViewById(R.id.tv_movie_overview);
 
             // Get the global views for the trailers

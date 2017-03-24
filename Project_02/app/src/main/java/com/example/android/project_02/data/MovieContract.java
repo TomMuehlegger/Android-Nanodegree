@@ -1,5 +1,6 @@
 package com.example.android.project_02.data;
 
+import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -32,5 +33,18 @@ public class MovieContract {
 
         // Name of the TITLE column
         public static final String COLUMN_TITLE = "title";
+        // Name of the OVERVIEW column
+        public static final String COLUMN_POSTER_URL = "posterUrl";
+        // Name of the OVERVIEW column
+        public static final String COLUMN_OVERVIEW = "overview";
+        // Name of the USER_RATING column
+        public static final String COLUMN_USER_RATING = "userRating";
+        // Name of the RELEASE_DATE column
+        public static final String COLUMN_RELEASE_DATE = "releaseDate";
+
+        // for building URIs on insertion
+        public static Uri buildMovieUriWithId(long id){
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 }

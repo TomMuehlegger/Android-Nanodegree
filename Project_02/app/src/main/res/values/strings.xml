@@ -2,11 +2,17 @@
     <string name="app_name">Popular Movies</string>
     <string name="sort_by_popular_text">Most popular</string>
     <string name="sort_by_rating_text">Top rated</string>
+    <string name="show_favorites_text">Show favorites</string>
     <string name="sort_by_popular">popular</string>
     <string name="sort_by_rating">top_rated</string>
+    <string name="show_favorites">favorites</string>
     <string name="error_loading_movies_message">Error loading movie data</string>
     <string name="error_loading_trailers_message">Error loading trailer data</string>
     <string name="error_loading_reviews_message">Error loading review data</string>
     <string name="trailers_title">Trailers</string>
     <string name="reviews_title">Reviews</string>
+    <string name="mark_as_favorite">Mark as favorite</string>
+    <string name="remove_from_favorites">Remove from favorites</string>
+    <!-- String for the content provider authority -->
+    <string name="content_authority">com.example.android.project_02</string>
 </resources>

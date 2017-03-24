@@ -60,6 +60,12 @@
                         android:layout_height="wrap_content"
                         android:padding="@dimen/padding_small"
                         android:textSize="@dimen/text_sz_large" />
+
+                    <ToggleButton
+                        android:id="@+id/tb_mark_movie_as_favorite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mark_as_favorite" />
                 </LinearLayout>
             </LinearLayout>
 
