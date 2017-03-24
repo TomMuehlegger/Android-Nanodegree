@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_movie_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_bar_height"
+        android:padding="@dimen/padding_medium"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_sz_extra_large"
+        android:background="@color/colorAccent"
+        android:gravity="center_vertical"
+        tools:text="Movie title"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1">
+
+                <ImageView
+                    android:id="@+id/iv_movie_poster"
+                    android:layout_width="@dimen/zero_size"
+                    android:layout_weight="0.4"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/padding_large"
+                    android:adjustViewBounds="true" />
+
+                <LinearLayout
+                    android:layout_width="@dimen/zero_size"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.6"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_large">
+
+                    <TextView
+                        android:id="@+id/tv_movie_release_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/padding_small"
+                        android:textSize="@dimen/text_sz_large" />
+
+                    <TextView
+                        android:id="@+id/tv_movie_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/padding_small"
+                        android:textSize="@dimen/text_sz_large" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_movie_overview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_medium"
+                android:textSize="@dimen/text_sz_large" />
+
+            <ImageView
+                android:id="@+id/divider"
+                android:background="@color/colorPrimary"
+                android:layout_height="2dp"
+                android:layout_marginLeft="@dimen/margin_medium"
+                android:layout_marginRight="@dimen/margin_medium"
+                android:layout_width="match_parent" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_medium"
+                android:textSize="@dimen/text_sz_large"
+                android:text="@string/trailers_title"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_movie_trailers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_medium"
+                android:visibility="gone"/>
+
+            <TextView
+                tools:text="@string/error_loading_trailers_message"
+                android:id="@+id/tv_trailer_error_message_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_medium"
+                android:text="@string/error_loading_trailers_message"
+                android:textSize="@dimen/text_sz_large"
+                android:visibility="gone"/>
+
+            <ProgressBar
+                android:id="@+id/pb_loading_trailers_indicator"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_medium"
+                android:textSize="@dimen/text_sz_large"
+                android:text="@string/reviews_title"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_movie_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+            <TextView
+                tools:text="@string/error_loading_reviews_message"
+                android:id="@+id/tv_review_error_message_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_medium"
+                android:text="@string/error_loading_trailers_message"
+                android:textSize="@dimen/text_sz_large"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/pb_loading_reviews_indicator"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
