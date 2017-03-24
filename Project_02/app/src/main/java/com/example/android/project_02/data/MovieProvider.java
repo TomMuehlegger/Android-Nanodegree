@@ -70,7 +70,7 @@ public class MovieProvider extends ContentProvider {
          * they aren't going to change. In Sunshine, we use CODE_WEATHER or CODE_WEATHER_WITH_DATE.
          */
 
-        /* This URI is content://com.example.android.sunshine/weather/ */
+        /* This URI is content://com.example.android.project_02/movie/ */
         matcher.addURI(authority, MovieContract.PATH_MOVIE, CODE_MOVIE);
 
         /*
@@ -133,16 +133,12 @@ public class MovieProvider extends ContentProvider {
                 int rowsInserted = 0;
                 try {
                     for (ContentValues value : values) {
-                        /*long weatherDate =
-                                value.getAsLong(WeatherContract.WeatherEntry.COLUMN_DATE);
-                        if (!SunshineDateUtils.isDateNormalized(weatherDate)) {
-                            throw new IllegalArgumentException("Date must be normalized to insert");
-                        }
+                        String movieTitle = value.getAsString(MovieContract.MovieEntry.COLUMN_TITLE);
+                        long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, value);
 
-                        long _id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             rowsInserted++;
-                        }*/
+                        }
                     }
                     db.setTransactionSuccessful();
                 } finally {
@@ -217,16 +213,16 @@ public class MovieProvider extends ContentProvider {
                  */
                 String[] selectionArguments = new String[]{normalizedUtcDateString};
 
-                /*cursor = mOpenHelper.getReadableDatabase().query(
+                cursor = mOpenHelper.getReadableDatabase().query(
                         /* Table we are going to query */
-                        //WeatherContract.WeatherEntry.TABLE_NAME,
+                        MovieContract.MovieEntry.TABLE_NAME,
                         /*
                          * A projection designates the columns we want returned in our Cursor.
                          * Passing null will return all columns of data within the Cursor.
                          * However, if you don't need all the data from the table, it's best
                          * practice to limit the columns returned in the Cursor with a projection.
                          */
-                        //projection,
+                        projection,
                         /*
                          * The URI that matches CODE_WEATHER_WITH_DATE contains a date at the end
                          * of it. We extract that date and use it with these next two lines to
@@ -236,11 +232,11 @@ public class MovieProvider extends ContentProvider {
                          * within the selectionArguments array will be inserted into the
                          * selection statement by SQLite under the hood.
                          */
-                        /*WeatherContract.WeatherEntry.COLUMN_DATE + " = ? ",
+                        MovieContract.MovieEntry.COLUMN_TITLE + " = ? ",
                         selectionArguments,
                         null,
                         null,
-                        sortOrder);*/
+                        sortOrder);
 
                 break;
             }
@@ -257,14 +253,14 @@ public class MovieProvider extends ContentProvider {
              * in our weather table.
              */
             case CODE_MOVIE: {
-                /*cursor = mOpenHelper.getReadableDatabase().query(
-                        WeatherContract.WeatherEntry.TABLE_NAME,
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
                         null,
                         null,
-                        sortOrder);*/
+                        sortOrder);
 
                 break;
             }
@@ -273,7 +269,7 @@ public class MovieProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
-        //cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 
@@ -301,17 +297,23 @@ public class MovieProvider extends ContentProvider {
         if (null == selection) selection = "1";
 
         switch (sUriMatcher.match(uri)) {
+            case CODE_MOVIE:
+                numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+
             default:
-                //throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
         /* If we actually deleted any rows, notify that a change has occurred to this URI */
-        //if (numRowsDeleted != 0) {
-            //getContext().getContentResolver().notifyChange(uri, null);
-        //}
+        if (numRowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
 
-        return 0;
-        //numRowsDeleted;
+        return numRowsDeleted;
     }
 
     /**
@@ -326,7 +328,7 @@ public class MovieProvider extends ContentProvider {
      */
     @Override
     public String getType(@NonNull Uri uri) {
-        throw new RuntimeException("We are not implementing getType in Sunshine.");
+        throw new RuntimeException("We are not implementing getType in Popular Movies.");
     }
 
     /**
@@ -342,12 +344,12 @@ public class MovieProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
         throw new RuntimeException(
-                "We are not implementing insert in Sunshine. Use bulkInsert instead");
+                "We are not implementing insert in Popular Movies. Use bulkInsert instead");
     }
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        throw new RuntimeException("We are not implementing update in Sunshine");
+        throw new RuntimeException("We are not implementing update in Popular Movies");
     }
 
     /**
