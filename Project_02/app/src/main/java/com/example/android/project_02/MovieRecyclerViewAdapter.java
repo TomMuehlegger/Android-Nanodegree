@@ -2,6 +2,9 @@ package com.example.android.project_02;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +15,7 @@ import com.example.android.project_02.data.Movie;
 import com.example.android.project_02.movie_detail.MovieDetailActivity;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,9 +23,9 @@ import java.util.List;
  */
 public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecyclerViewAdapter.ViewHolder> {
 
-    private List<Movie> mMovies;
+    private ArrayList<Movie> mMovies;
 
-    public MovieRecyclerViewAdapter(List<Movie> movies) {
+    public MovieRecyclerViewAdapter(ArrayList<Movie> movies) {
         mMovies = movies;
     }
 
@@ -43,18 +47,27 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
 
     /**
      * Update the movie data of the recycler view adapter
-     * @param movieData
+     * @param movieData - movie data to update
      */
-    public void updateMovieData(List<Movie> movieData) {
+    public void updateMovieData(ArrayList<Movie> movieData) {
         mMovies.clear();
         mMovies.addAll(movieData);
         notifyDataSetChanged();
     }
 
     /**
+     * Get the movie list of the adapter
+     * @return - list of movies
+     */
+    public ArrayList<Movie> getMovies() {
+        // Return the movie list
+        return mMovies;
+    }
+
+    /**
      * Get the movie at a certain position
      *
-     * @param position
+     * @param position - position of the movie to get from the recylcer view
      * @return movie on a certain position
      */
     private Movie getMovieAt(int position) {

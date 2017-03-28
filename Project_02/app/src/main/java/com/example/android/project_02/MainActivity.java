@@ -29,11 +29,15 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private static final String MOVIE_LIST_KEY = "movieList";
+    private static final String SORT_CRITERIA_KEY = "sortCriteria";
+
     private MovieRecyclerViewAdapter mMovieAdapter;
 
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessageDisplay;
     private RecyclerView mMovieOverview;
+    private String mSortCriteria;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Get the views of the main_activity
-        mLoadingIndicator = (ProgressBar)findViewById(R.id.pb_loading_indicator);
-        mMovieOverview = (RecyclerView)findViewById(R.id.rv_movies_overview);
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        mMovieOverview = (RecyclerView) findViewById(R.id.rv_movies_overview);
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
 
         mMovieAdapter = new MovieRecyclerViewAdapter(new ArrayList<Movie>());
@@ -52,8 +56,28 @@ public class MainActivity extends AppCompatActivity {
         // Set the layout manager of the recycler view to a grid layout
         mMovieOverview.setLayoutManager(new GridLayoutManager(this, 2));
 
-        // Load the movie data sorted by popularity
-        loadMovieData(getString(R.string.sort_by_popular));
+        if ((savedInstanceState != null) && (savedInstanceState.containsKey(MOVIE_LIST_KEY)) && (savedInstanceState.containsKey(SORT_CRITERIA_KEY))) {
+            // Set the sort criteria string
+            mSortCriteria = savedInstanceState.getString(SORT_CRITERIA_KEY);
+
+            // If there is a previous movie list stored, update the movie list adapter
+            ArrayList<Movie> previousMovieList = savedInstanceState.getParcelableArrayList(MOVIE_LIST_KEY);
+            mMovieAdapter.updateMovieData(previousMovieList);
+        } else {
+            // Set the default sort criteria string to sort by popular
+            mSortCriteria = getString(R.string.sort_by_popular);
+            // otherwise load data from the movie db server
+            loadMovieData(mSortCriteria);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Call super.onSaveInstanceState
+        super.onSaveInstanceState(outState);
+        // Save the movie list in the outState Bundle
+        outState.putParcelableArrayList(MOVIE_LIST_KEY, mMovieAdapter.getMovies());
+        outState.putString(SORT_CRITERIA_KEY, mSortCriteria);
     }
 
     /**
@@ -82,19 +106,30 @@ public class MainActivity extends AppCompatActivity {
 
         // If item id is action_sort_by_popular, load movie data sorted by popularity
         if (id == R.id.action_sort_by_popular) {
+            mSortCriteria = getString(R.string.sort_by_popular);
             loadMovieData(getString(R.string.sort_by_popular));
             return true;
         }
         // Else if item id is action_sort_by_rating, load movie data sorted by rating
         else if (id == R.id.action_sort_by_rating) {
+            mSortCriteria = getString(R.string.sort_by_rating);
             loadMovieData(getString(R.string.sort_by_rating));
             return true;
-        }
-        else if (id == R.id.action_show_favorites) {
+        } else if (id == R.id.action_show_favorites) {
+            mSortCriteria = getString(R.string.show_favorites);
             displayMovieData(getFavoriteMovies());
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mSortCriteria.equals(getString(R.string.show_favorites))) {
+            displayMovieData(getFavoriteMovies());
+        }
     }
 
     private void showMovieDataView() {
@@ -111,16 +146,16 @@ public class MainActivity extends AppCompatActivity {
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
-    private List<Movie> getFavoriteMovies() {
-        List<Movie> movies = new ArrayList<>();
+    private ArrayList<Movie> getFavoriteMovies() {
+        ArrayList<Movie> movies = new ArrayList<>();
 
         final ContentResolver resolver = getContentResolver();
-        String[] projectionColumns = {  MovieContract.MovieEntry._ID,
-                                        MovieContract.MovieEntry.COLUMN_TITLE,
-                                        MovieContract.MovieEntry.COLUMN_OVERVIEW,
-                                        MovieContract.MovieEntry.COLUMN_POSTER_URL,
-                                        MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
-                                        MovieContract.MovieEntry.COLUMN_USER_RATING
+        String[] projectionColumns = {MovieContract.MovieEntry._ID,
+                MovieContract.MovieEntry.COLUMN_TITLE,
+                MovieContract.MovieEntry.COLUMN_OVERVIEW,
+                MovieContract.MovieEntry.COLUMN_POSTER_URL,
+                MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+                MovieContract.MovieEntry.COLUMN_USER_RATING
         };
 
         Cursor cursor = resolver.query(MovieContract.MovieEntry.CONTENT_URI,
@@ -151,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param movieData - movie list to display
      */
-    private void displayMovieData(List<Movie> movieData) {
+    private void displayMovieData(ArrayList<Movie> movieData) {
         // If the provided movie data is valid
         if (movieData != null) {
             // Show the movie data view and update the recycle view adapter
@@ -163,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public class FetchMovieDataTask extends AsyncTask<String, Void, List<Movie>> {
+    public class FetchMovieDataTask extends AsyncTask<String, Void, ArrayList<Movie>> {
 
         @Override
         protected void onPreExecute() {
@@ -173,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected List<Movie> doInBackground(String... params) {
+        protected ArrayList<Movie> doInBackground(String... params) {
 
             // Set sort by popular to default sort order
             String sortByString = getString(R.string.sort_by_popular);
@@ -199,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<Movie> movieData) {
+        protected void onPostExecute(ArrayList<Movie> movieData) {
             // Hide the loading indicator
             mLoadingIndicator.setVisibility(View.INVISIBLE);
 

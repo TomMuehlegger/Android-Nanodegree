@@ -27,7 +27,7 @@ public final class MovieJsonUtils {
      * @throws JSONException
      * @throws ParseException
      */
-    public static List<Movie> getMovieDataFromJson(String movieDataJsonString) throws JSONException, ParseException {
+    public static ArrayList<Movie> getMovieDataFromJson(String movieDataJsonString) throws JSONException, ParseException {
 
         final String TMDB_IMAGE_ROOT = "http://image.tmdb.org/t/p/w185/";
         final String MOVIE_LIST = "results";
@@ -42,7 +42,7 @@ public final class MovieJsonUtils {
         JSONObject moviesPageJSON = new JSONObject(movieDataJsonString);
         JSONArray moviesJSON = moviesPageJSON.getJSONArray(MOVIE_LIST);
 
-        List<Movie> movies = new ArrayList<>();
+        ArrayList<Movie> movies = new ArrayList<>();
 
         // Parse each element of the results array and add it to the movies list
         for (int i = 0; i < moviesJSON.length(); i++) {
