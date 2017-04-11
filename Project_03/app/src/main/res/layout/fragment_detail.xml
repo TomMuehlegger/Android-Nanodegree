@@ -1,0 +1,98 @@
+<!-- Detail Layout for Grid -->
+<android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detail_additional_pane"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="2"
+    android:background="@color/detail_accent_pane_background"
+    android:paddingBottom="@dimen/abc_list_item_padding_horizontal_material"
+    android:paddingEnd="@dimen/detail_horizontal_padding"
+    android:paddingLeft="@dimen/detail_horizontal_padding"
+    android:paddingRight="@dimen/detail_horizontal_padding"
+    android:paddingStart="@dimen/detail_horizontal_padding"
+    android:paddingTop="@dimen/abc_list_item_padding_horizontal_material"
+    app:columnCount="2">
+
+    <TextView
+        android:id="@+id/detail_name_label_textview"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/detail_accent_label"
+        android:text="@string/name"
+        app:layout_columnWeight="1"
+        app:layout_gravity="fill"
+        app:layout_rowWeight="1"
+        tools:text="@string/name"/>
+
+    <TextView
+        android:id="@+id/detail_name_textview"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@android:color/white"
+        app:layout_gravity="fill"
+        tools:text="Google Inc." />
+
+    <TextView
+        android:id="@+id/detail_price_label_textview"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/detail_accent_label"
+        android:text="@string/price"
+        app:layout_gravity="fill"
+        app:layout_rowWeight="1"
+        tools:text="@string/price"/>
+
+    <TextView
+        android:id="@+id/detail_price_textview"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@android:color/white"
+        app:layout_gravity="fill"
+        tools:text="200 $" />
+
+    <TextView
+        android:id="@+id/detail_change_percentage_label_textview"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/detail_accent_label"
+        android:textSize="20sp"
+        android:text="@string/change_percentage"
+        app:layout_gravity="fill"
+        app:layout_rowWeight="1"
+        tools:text="@string/change_percentage"/>
+
+    <TextView
+        android:id="@+id/detail_change_percentage_textview"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@android:color/white"
+        app:layout_gravity="fill"
+        tools:text="+1.1 %" />
+
+    <TextView
+        android:id="@+id/detail_change_absolute_label_textview"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/detail_accent_label"
+        android:textSize="20sp"
+        android:text="@string/change_absolute"
+        app:layout_gravity="fill"
+        app:layout_rowWeight="1"
+        tools:text="@string/change_absolute"/>
+
+    <TextView
+        android:id="@+id/detail_change_absolute_textview"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@android:color/white"
+        app:layout_gravity="fill"
+        tools:text="+2.3 $" />
+</android.support.v7.widget.GridLayout>
+

@@ -30,7 +30,8 @@ public final class PrefUtils {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean(initializedKey, true);
             editor.putStringSet(stocksKey, defaultStocks);
-            editor.apply();
+            // do commit instead apply to save data in persistent data
+            editor.commit();
             return defaultStocks;
         }
         return prefs.getStringSet(stocksKey, new HashSet<String>());
@@ -50,7 +51,8 @@ public final class PrefUtils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet(key, stocks);
-        editor.apply();
+        // do commit instead apply to save data in persistent data
+        editor.commit();
     }
 
     public static void addStock(Context context, String symbol) {
@@ -85,7 +87,8 @@ public final class PrefUtils {
             editor.putString(key, absoluteKey);
         }
 
-        editor.apply();
+        // do commit instead apply to save data in persistent data
+        editor.commit();
     }
 
 }

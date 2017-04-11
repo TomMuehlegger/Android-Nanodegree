@@ -1,3 +1,17 @@
 <resources>
+    <!-- Main app dimensions -->
+    <dimen name="zero">0dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="detail_horizontal_padding">32dp</dimen>
+    <dimen name="add_stock_dialog_margin">4dp</dimen>
+    <dimen name="add_stock_dialog_margin_top">16dp</dimen>
+    <dimen name="list_item_padding_small">3dp</dimen>
+    <dimen name="list_item_padding_large">16dp</dimen>
+    <dimen name="list_item_price_margin">10sp</dimen>
+
+    <!-- Widget dimensions -->
+    <dimen name="widget_detail_default_width">250dp</dimen>
+    <dimen name="widget_detail_default_height">180dp</dimen>
+    <dimen name="widget_detail_min_resize_width">@dimen/widget_detail_default_width</dimen>
+    <dimen name="widget_detail_min_resize_height">@dimen/widget_detail_default_height</dimen>
 </resources>

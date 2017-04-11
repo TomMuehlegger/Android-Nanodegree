@@ -31,25 +31,25 @@ import yahoofinance.quotes.stock.StockQuote;
 public final class QuoteSyncJob {
 
     private static final int ONE_OFF_ID = 2;
-    private static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
+    public static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
     private static final int PERIOD = 300000;
     private static final int INITIAL_BACKOFF = 10000;
     private static final int PERIODIC_ID = 1;
-    private static final int YEARS_OF_HISTORY = 2;
+    private static final int YEARS_OF_HISTORY = 1;
 
     private QuoteSyncJob() {
     }
 
-    static void getQuotes(Context context) {
+    static List<String> getQuotes(Context context) {
 
         Timber.d("Running sync job");
 
         Calendar from = Calendar.getInstance();
         Calendar to = Calendar.getInstance();
         from.add(Calendar.YEAR, -YEARS_OF_HISTORY);
+        ArrayList<String> stocksNotFound = new ArrayList<>();
 
         try {
-
             Set<String> stockPref = PrefUtils.getStocks(context);
             Set<String> stockCopy = new HashSet<>();
             stockCopy.addAll(stockPref);
@@ -58,9 +58,10 @@ public final class QuoteSyncJob {
             Timber.d(stockCopy.toString());
 
             if (stockArray.length == 0) {
-                return;
+                return stocksNotFound;
             }
 
+            // Load the stocks without historical data
             Map<String, Stock> quotes = YahooFinance.get(stockArray);
             Iterator<String> iterator = stockCopy.iterator();
 
@@ -75,13 +76,23 @@ public final class QuoteSyncJob {
                 Stock stock = quotes.get(symbol);
                 StockQuote quote = stock.getQuote();
 
+                // Check whether the price is null -> stock not found
+                // Don't find another way to check whether the stock was found or not
+                if (quote.getPrice() == null) {
+                    // remove the stock from the preferences
+                    PrefUtils.removeStock(context, symbol);
+                    // Add symbol to the stocks not found list
+                    stocksNotFound.add(symbol);
+                    continue;
+                }
+
                 float price = quote.getPrice().floatValue();
                 float change = quote.getChange().floatValue();
                 float percentChange = quote.getChangeInPercent().floatValue();
 
                 // WARNING! Don't request historical data for a stock that doesn't exist!
                 // The request will hang forever X_x
-                List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
+                List<HistoricalQuote> history = stock.getHistory(from, to, Interval.MONTHLY);
 
                 StringBuilder historyBuilder = new StringBuilder();
 
@@ -110,17 +121,18 @@ public final class QuoteSyncJob {
                             Contract.Quote.URI,
                             quoteCVs.toArray(new ContentValues[quoteCVs.size()]));
 
+            // Send broadcast to inform widgets,... to update views
             Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
             context.sendBroadcast(dataUpdatedIntent);
 
         } catch (IOException exception) {
             Timber.e(exception, "Error fetching stock quotes");
         }
+        return stocksNotFound;
     }
 
     private static void schedulePeriodic(Context context) {
         Timber.d("Scheduling a periodic task");
-
 
         JobInfo.Builder builder = new JobInfo.Builder(PERIODIC_ID, new ComponentName(context, QuoteJobService.class));
 
@@ -163,8 +175,6 @@ public final class QuoteSyncJob {
             JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
             scheduler.schedule(builder.build());
-
-
         }
     }
 
