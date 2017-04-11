@@ -74,11 +74,21 @@ public final class QuoteSyncJob {
 
 
                 Stock stock = quotes.get(symbol);
+
+                // Check whether the stock is null -> e.g. on special characters in symbol
+                if (stock == null) {
+                    // remove the stock from the preferences
+                    PrefUtils.removeStock(context, symbol);
+                    // Add symbol to the stocks not found list
+                    stocksNotFound.add(symbol);
+                    continue;
+                }
+
                 StockQuote quote = stock.getQuote();
 
-                // Check whether the price is null -> stock not found
+                // Check whether the quote or the price is null -> stock not found
                 // Don't find another way to check whether the stock was found or not
-                if (quote.getPrice() == null) {
+                if ( (quote == null) || (quote.getPrice() == null) ) {
                     // remove the stock from the preferences
                     PrefUtils.removeStock(context, symbol);
                     // Add symbol to the stocks not found list
