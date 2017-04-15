@@ -1,25 +1,30 @@
 package com.udacity.gradle.builditbigger;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
-import com.example.JokeProvider;
+import com.example.android.androidjokeslib.DisplayJokeActivity;
 
+public class MainActivity extends AppCompatActivity implements OnJokeTaskCompleted {
 
-public class MainActivity extends AppCompatActivity {
-
-    private JokeProvider jokeProvider;
+    private LinearLayout mLoadingLayout;
+    private FrameLayout mMainLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
 
+        mLoadingLayout = (LinearLayout)findViewById(R.id.loading_frame);
+        mMainLayout = (FrameLayout)findViewById(R.id.main_frame);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -44,10 +49,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tellJoke(View view) {
-        if (jokeProvider == null) {
-            jokeProvider = new JokeProvider();
-        }
+        mLoadingLayout.setVisibility(View.VISIBLE);
+        mMainLayout.setVisibility(View.GONE);
+        // Retrieve joke from Google Cloud Endpoint
+        new EndpointAsyncTask().execute(this);
+    }
 
-        Toast.makeText(this, jokeProvider.getNextJoke(), Toast.LENGTH_SHORT).show();
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Hide the loader layout and show the main layout
+        mLoadingLayout.setVisibility(View.GONE);
+        mMainLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onTaskCompleted(String joke) {
+        // Create the intent to display the display joke activity
+        Intent jokeIntent = new Intent(this, DisplayJokeActivity.class);
+        // Set the joke to the extra data
+        jokeIntent.putExtra(DisplayJokeActivity.EXTRA_JOKE, joke);
+        // Show the display joke activity
+        this.startActivity(jokeIntent);
     }
 }
