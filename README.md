@@ -7,3 +7,4 @@ This repository contains project work for Udacity's [Android Developer Nanodegre
 - **Project_01** - Popular Movies
 - **Project_02** - Popular Movies Extension
 - **Project_03** - Stock Hawk
+- **Project_04** - Build it bigger
