@@ -23,7 +23,6 @@ public class EndpointsAsyncTaskAndroidTest extends AndroidTestCase implements On
         // Wait for the signal to count down
         signal.await();
 
-        assertEquals("Joke", joke);
         // Check if the joke is empty
         assertFalse(joke.isEmpty());
         // Check if the joke is valid
