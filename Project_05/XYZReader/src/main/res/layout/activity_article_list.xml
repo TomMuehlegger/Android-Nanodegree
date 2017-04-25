@@ -8,9 +8,8 @@
         android:id="@+id/toolbar_container"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_toolbar_height"
-        android:background="?colorPrimary"
         android:gravity="bottom"
-        android:elevation="8dp">
+        android:elevation="4dp">
 
 
         <android.support.v7.widget.Toolbar
