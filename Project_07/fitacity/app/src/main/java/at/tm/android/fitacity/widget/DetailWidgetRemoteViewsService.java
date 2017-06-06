@@ -1,22 +1,18 @@
 package at.tm.android.fitacity.widget;
 
 import android.annotation.TargetApi;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Bundle;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-
+import at.tm.android.fitacity.ExerciseDetailActivity;
 import at.tm.android.fitacity.R;
+import at.tm.android.fitacity.data.Exercise;
 import at.tm.android.fitacity.data.FitacityContract;
 
 /**
@@ -32,7 +28,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
 
             @Override
             public void onCreate() {
-                System.out.println("On create");
+                // Nothing to do here
             }
 
             @Override
@@ -42,28 +38,13 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 }
                 // Clear the calling identity and store token
                 final long identityToken = Binder.clearCallingIdentity();
-                Uri favoriteExerciseQuoteUri = FitacityContract.ExerciseEntry.CONTENT_URI;
-
-                String[] projectionColumns = {
-                        FitacityContract.ExerciseEntry.COLUMN_ID,
-                        FitacityContract.ExerciseEntry.COLUMN_NAME,
-                        FitacityContract.ExerciseEntry.COLUMN_DESCRIPTION,
-                        FitacityContract.ExerciseEntry.COLUMN_CATEGORY,
-                        FitacityContract.ExerciseEntry.COLUMN_EQUIPMENT,
-                        FitacityContract.ExerciseEntry.COLUMN_DIFFICULTY,
-                        FitacityContract.ExerciseEntry.COLUMN_VIDEO_URL,
-                        FitacityContract.ExerciseEntry.COLUMN_IMG_URL
-                };
-
-                // Get the favorite exercises
-                data = getContentResolver().query(favoriteExerciseQuoteUri,
-                        projectionColumns,
+                Uri getExerciseUri = FitacityContract.ExerciseEntry.CONTENT_URI;
+                // Get the stock quotes
+                data = getContentResolver().query(getExerciseUri,
+                        null,
                         null,
                         null,
                         null);
-
-                System.out.println("On data changed");
-
                 // Restore the calling identity with stored token
                 Binder.restoreCallingIdentity(identityToken);
             }
@@ -83,56 +64,32 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
 
             @Override
             public RemoteViews getViewAt(int position) {
-                System.out.println("Get view at with name");
-
                 if (position == AdapterView.INVALID_POSITION || data == null || !data.moveToPosition(position)) {
                     return null;
                 }
-
-                RemoteViews views = new RemoteViews(getPackageName(), R.layout.list_item);
-                System.out.println("Get view at with name ok");
+                RemoteViews row = new RemoteViews(getPackageName(), R.layout.list_item);
 
                 // Read data to display widget list items
-                int id = data.getInt(0);
-                String name = data.getString(1);
-                String description = data.getString(2);
-                int category = data.getInt(3);
-                String equipment = data.getString(4);
-                float difficulty = data.getFloat(5);
-                String videoUrl = data.getString(6);
-                String imgUrl = data.getString(7);
+                int id = data.getInt(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_ID));
+                String name = data.getString(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_NAME));
+                String description = data.getString(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_DESCRIPTION));
+                int category = data.getInt(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_CATEGORY));
+                String equipment = data.getString(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_EQUIPMENT));
+                float difficulty = data.getFloat(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_DIFFICULTY));
+                String videoUrl = data.getString(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_VIDEO_URL));
+                String imgUrl = data.getString(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_IMG_URL));
 
-                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                    views.setContentDescription(R.id.avatar, getString(R.string.a11y_img_url, imgUrl));
-                    views.setContentDescription(R.id.tv_exercise_name, getString(R.string.a11y_name, name));
-                }*/
+                row.setTextViewText(R.id.name, name);
+                row.setImageViewResource(R.id.avatar, R.drawable.ic_favorite);
 
-                //Glide.with(getApplicationContext()).load(imgUrl).fitCenter().into();
-                System.out.println("Set name of exercise to : " + name);
-                //views.setTextViewText(R.id.name, name);
-                System.out.println("Set name of exercise to : " + name + " finished");
-                //views.setImageViewResource(R.id.avatar, R.drawable.ic_dashboard);
+                // Add fill in intent to launch the exercise activity when clicking an favorite exercise
+                Exercise exercise = new Exercise(id, name, description, category, equipment, difficulty, videoUrl, imgUrl);
+                Intent fillInIntent = new Intent();
+                fillInIntent.putExtra(ExerciseDetailActivity.EXERCISE_EXTRA_NAME, exercise);
 
-                //final Intent fillInIntent = new Intent();
+                row.setOnClickFillInIntent(R.id.widget, fillInIntent);
 
-                /*Uri favoriteExerciseUri = FitacityContract.ExerciseEntry.CONTENT_URI;
-                fillInIntent.setData(favoriteExerciseUri);
-                views.setOnClickFillInIntent(R.id.widget_list, fillInIntent);*/
-
-                /*final AppWidgetManager manager = AppWidgetManager.getInstance(getApplicationContext());
-
-                final int[] widgetIds = manager.getAppWidgetIds(new ComponentName(getApplicationContext(), DetailWidgetProvider.class));
-
-                for (final int widgetId : widgetIds) {
-                    manager.updateAppWidget(widgetId, views);
-                }*/
-
-                /*final Intent fillInIntent = new Intent();
-                Uri exerciseUri = FitacityContract.ExerciseEntry.CONTENT_URI;
-                fillInIntent.setData(exerciseUri);
-                views.setOnClickFillInIntent(R.id.widget_list, fillInIntent);*/
-
-                return views;
+                return row;
             }
 
             @Override
@@ -148,7 +105,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
             @Override
             public long getItemId(int position) {
                 if (data.moveToPosition(position))
-                    return data.getInt(0);
+                    return data.getLong(0);
                 return position;
             }
 

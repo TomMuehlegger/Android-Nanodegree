@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 import at.tm.android.fitacity.data.Exercise;
+import at.tm.android.fitacity.utilities.CircleTransform;
 
 /**
  * ExerciseRecyclerViewAdapter class
@@ -28,6 +29,10 @@ public class ExerciseRecyclerViewAdapter extends RecyclerView.Adapter<ExerciseRe
         mExercises = exercises;
     }
 
+    public ExerciseRecyclerViewAdapter() {
+        mExercises = new ArrayList<>();
+    }
+
     /**
      * ViewHolder class, holding data of each movie view
      */
@@ -37,7 +42,6 @@ public class ExerciseRecyclerViewAdapter extends RecyclerView.Adapter<ExerciseRe
         final View mView;
         final TextView mName;
         final ImageView mImageView;
-        //final TextView mDifficulty;
 
         public ViewHolder(View view) {
             super(view);
@@ -99,7 +103,11 @@ public class ExerciseRecyclerViewAdapter extends RecyclerView.Adapter<ExerciseRe
 
         holder.mName.setText(holder.mExercise.getName());
 
-        Glide.with(holder.mImageView.getContext()).load(holder.mExercise.getImgUrl()).fitCenter().into(holder.mImageView);
+        // Load the image to the imageview and use a circle transformation
+        Glide.with(holder.mImageView.getContext())
+                .load(holder.mExercise.getImgUrl())
+                .transform(new CircleTransform(holder.mImageView.getContext()))
+                .into(holder.mImageView);
     }
 
     @Override

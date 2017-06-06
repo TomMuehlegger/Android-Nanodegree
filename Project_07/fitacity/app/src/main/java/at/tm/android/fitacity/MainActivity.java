@@ -26,6 +26,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -53,9 +54,15 @@ import at.tm.android.fitacity.utilities.NetworkUtils;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout mDrawerLayout;
-    private Map<Integer, Category> categoryMenuMap;
-    private ExerciseRecyclerViewAdapter exerciseRecyclerViewAdapter;
-    private NavigationView navigationView;
+    private Map<Integer, Category> mCategoryMenuMap;
+    private ExerciseRecyclerViewAdapter mExerciseRecyclerViewAdapter;
+    private NavigationView mNavigationView;
+    private int mSelectedCategoryId;
+
+    private static final int FAVORITE_CATEGORY_ID = R.id.menu_favorites;
+    private static final String EXERCISE_LIST_KEY = "exerciseList";
+    private static final String CATEGORY_LIST_KEY = "categoryList";
+    private static final String SELECTED_CATEGORY_ID_KEY = "selectedCategoryId";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +78,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView != null) {
-            navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        if (mNavigationView != null) {
+            mNavigationView.setNavigationItemSelectedListener(this);
         }
 
         AdView mAdView = (AdView) findViewById(R.id.adView);
@@ -85,18 +92,70 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .build();
         mAdView.loadAd(adRequest);
 
+        // Setup the recycler view with it's adapter
         RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerview);
-        setupRecyclerView(rv);
+        rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
 
-        new FetchCategoryDataTask().execute();
+        if ((savedInstanceState != null) &&
+            (savedInstanceState.containsKey(EXERCISE_LIST_KEY)) &&
+            (savedInstanceState.containsKey(SELECTED_CATEGORY_ID_KEY)) &&
+            (savedInstanceState.containsKey(SELECTED_CATEGORY_ID_KEY))) {
+
+            // Set the selected category id
+            mSelectedCategoryId = savedInstanceState.getInt(SELECTED_CATEGORY_ID_KEY);
+
+            // If there is a previous category list stored, update the menu items
+            List<Category> previousCategoryList = savedInstanceState.getParcelableArrayList(CATEGORY_LIST_KEY);
+            setCategoriesMenu(previousCategoryList);
+
+            // Set the stored exercise list to the recycler view adapter
+            mExerciseRecyclerViewAdapter = new ExerciseRecyclerViewAdapter();
+
+            if (mSelectedCategoryId == FAVORITE_CATEGORY_ID) {
+                // Set the favorite exercises evertime the favorite category is selected
+                setExerciseData(getFavoriteExercises());
+            }
+            else {
+                // If there is a previous exercise list stored, update the exercise list adapter
+                List<Exercise> previousExerciseList = savedInstanceState.getParcelableArrayList(EXERCISE_LIST_KEY);
+                setExerciseData(previousExerciseList);
+            }
+
+        } else {
+            // Set the default category id to the favorite category
+            mSelectedCategoryId = FAVORITE_CATEGORY_ID;
+
+            // Fetch the category data when no categories stored
+            new FetchCategoryDataTask().execute();
+
+            // load the favorite exercises and put it into the recycler view adapter
+            mExerciseRecyclerViewAdapter = new ExerciseRecyclerViewAdapter(getFavoriteExercises());
+        }
+
+        // Set the adapter to the recycler view
+        rv.setAdapter(mExerciseRecyclerViewAdapter);
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        exerciseRecyclerViewAdapter = new ExerciseRecyclerViewAdapter(getFavoriteExercises());
-        recyclerView.setAdapter(exerciseRecyclerViewAdapter);
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mSelectedCategoryId == FAVORITE_CATEGORY_ID) {
+            setExerciseData(getFavoriteExercises());
+        }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Call super.onSaveInstanceState
+        super.onSaveInstanceState(outState);
+        // Save the exercise list in the outState Bundle
+        outState.putParcelableArrayList(EXERCISE_LIST_KEY, new ArrayList<>(mExerciseRecyclerViewAdapter.getExercises()));
+        // Save the category list in the outState Bundle
+        outState.putParcelableArrayList(CATEGORY_LIST_KEY, new ArrayList<>(mCategoryMenuMap.values()));
+        // Save the selected category id in the outState Bundle
+        outState.putInt(SELECTED_CATEGORY_ID_KEY, mSelectedCategoryId);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -130,14 +189,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         List<Exercise> exercises = new ArrayList<>();
 
         while (cursor.moveToNext()) {
-            int id = cursor.getInt(0);
-            String name = cursor.getString(1);
-            String description = cursor.getString(2);
-            int category = cursor.getInt(3);
-            String equipment = cursor.getString(4);
-            float difficulty = cursor.getFloat(5);
-            String videoUrl = cursor.getString(6);
-            String imgUrl = cursor.getString(7);
+            int id = cursor.getInt(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_ID));
+            String name = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_NAME));
+            String description = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_DESCRIPTION));
+            int category = cursor.getInt(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_CATEGORY));
+            String equipment = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_EQUIPMENT));
+            float difficulty = cursor.getFloat(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_DIFFICULTY));
+            String videoUrl = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_VIDEO_URL));
+            String imgUrl = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_IMG_URL));
 
             exercises.add(new Exercise(id, name, description, category, equipment, difficulty, videoUrl, imgUrl));
         }
@@ -149,14 +208,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
 
-        if (itemId == R.id.menu_favorites) {
+        if (itemId == FAVORITE_CATEGORY_ID) {
+            mSelectedCategoryId = FAVORITE_CATEGORY_ID;
             setExerciseData(getFavoriteExercises());
-        }
-        else {
+        } else {
             // A category selected
-            Category selectedCategory = categoryMenuMap.get(itemId);
+            Category selectedCategory = mCategoryMenuMap.get(itemId);
 
             if (selectedCategory != null) {
+                mSelectedCategoryId = selectedCategory.getId();
                 // Load category data here
                 new FetchExerciseDataTask().execute(selectedCategory.getId());
             }
@@ -166,25 +226,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    public class FetchCategoryDataTask extends AsyncTask<Void, Void, ArrayList<Category>> {
+    public class FetchCategoryDataTask extends AsyncTask<Void, Void, List<Category>> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Show the loading indicator
-            System.out.println("Start fetching categories from server");
+            // TODO: Show the loading indicator
         }
 
         @Override
-        protected ArrayList<Category> doInBackground(Void... params) {
+        protected List<Category> doInBackground(Void... params) {
 
             // Build url to get the category data
             URL categoryDataRequestUrl = NetworkUtils.buildUrl();
 
             try {
                 String jsonCategoryDataResponse = NetworkUtils.getResponseFromHttpUrl(categoryDataRequestUrl);
-
-                System.out.println("Categories response: " + jsonCategoryDataResponse);
 
                 // Parse categories from json response string
                 return FitacityJsonUtils.getCategoryDataFromJson(jsonCategoryDataResponse);
@@ -196,13 +254,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Category> categories) {
+        protected void onPostExecute(List<Category> categories) {
             // Set the category data to the menu
             setCategoriesMenu(categories);
         }
     }
 
-    public class FetchExerciseDataTask extends AsyncTask<Integer, Void, ArrayList<Exercise>> {
+    public class FetchExerciseDataTask extends AsyncTask<Integer, Void, List<Exercise>> {
 
         @Override
         protected void onPreExecute() {
@@ -211,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         @Override
-        protected ArrayList<Exercise> doInBackground(Integer... params) {
+        protected List<Exercise> doInBackground(Integer... params) {
 
             // Build url to get the category data
             URL exerciseDataRequestUrl = NetworkUtils.buildExerciseUrl(params[0]);
@@ -229,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Exercise> exercises) {
+        protected void onPostExecute(List<Exercise> exercises) {
             // Set the category data to the menu
             setExerciseData(exercises);
         }
@@ -240,25 +298,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      *
      * @param categories - category list to display
      */
-    private void setCategoriesMenu(ArrayList<Category> categories) {
+    private void setCategoriesMenu(List<Category> categories) {
         // If the provided category data is valid
         if (categories != null) {
-            categoryMenuMap = new HashMap<>();
+            mCategoryMenuMap = new HashMap<>();
 
             // Add the category data to the main menu
             for (Category category : categories) {
                 int itemId = View.generateViewId();
 
-                System.out.println("Category name: " + category.getName() + " id: " + itemId);
-
-                categoryMenuMap.put(itemId, category);
-                MenuItem menuItem = navigationView.getMenu().getItem(0).getSubMenu().add(0, itemId, 0, category.getName());
+                mCategoryMenuMap.put(itemId, category);
+                MenuItem menuItem = mNavigationView.getMenu().getItem(0).getSubMenu().add(0, itemId, 0, category.getName());
 
                 menuItem.setCheckable(true);
-
                 menuItem.setIcon(R.drawable.ic_dashboard);
-                System.out.println(category);
+
+                // If the selected category id is the actual category id, set the menu item to checked
+                if (category.getId() == mSelectedCategoryId) {
+                    menuItem.setChecked(true);
+                }
             }
+        }
+
+        if (mSelectedCategoryId == FAVORITE_CATEGORY_ID) {
+            MenuItem menuItem = mNavigationView.getMenu().getItem(1);
+            menuItem.setChecked(true);
         }
     }
 
@@ -270,11 +334,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setExerciseData(List<Exercise> exercises) {
         // If the provided exercise data is valid
         if (exercises != null) {
-            // Show the exercise data
-            for (Exercise exercise : exercises) {
-                System.out.println(exercise);
-            }
-            exerciseRecyclerViewAdapter.updateExerciseData(exercises);
+            // Update the exercise data
+            mExerciseRecyclerViewAdapter.updateExerciseData(exercises);
         }
     }
 }

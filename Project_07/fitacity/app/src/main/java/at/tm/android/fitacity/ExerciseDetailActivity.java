@@ -23,7 +23,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,6 +30,8 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
@@ -38,6 +39,7 @@ import com.google.android.youtube.player.YouTubePlayerView;
 
 import at.tm.android.fitacity.data.Exercise;
 import at.tm.android.fitacity.data.FitacityContract;
+import at.tm.android.fitacity.utilities.AnalyticsApplication;
 
 public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
 
@@ -45,6 +47,7 @@ public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTu
     private Exercise exercise;
     private FloatingActionButton fav_fab;
     private boolean exerciseIsFavorite;
+    private Tracker mTracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,10 @@ public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTu
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         fav_fab = (FloatingActionButton)findViewById(R.id.fav_fab);
+
+        // Obtain the shared Tracker instance for Google Analytics
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         final ContentResolver resolver = getContentResolver();
         String[] projectionColumns = {FitacityContract.ExerciseEntry.COLUMN_ID};
@@ -100,14 +107,26 @@ public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTu
                     exerciseValues.put(FitacityContract.ExerciseEntry.COLUMN_VIDEO_URL, exercise.getVideoUrl());
                     exerciseValues.put(FitacityContract.ExerciseEntry.COLUMN_IMG_URL, exercise.getImgUrl());
                     resolver.insert(FitacityContract.ExerciseEntry.CONTENT_URI, exerciseValues);
+
+                    // Send Google Analytics event to like the shown exercise
+                    mTracker.send(new HitBuilders.EventBuilder()
+                            .setCategory("Action")
+                            .setAction("Liked:" + exercise.getName())
+                            .build());
                 } else {
                     //Add icon
                     fav_fab.setImageResource(R.drawable.ic_unfavorite);
 
-                    // Remove movie from local favorites
+                    // Remove exercise from local favorites
                     resolver.delete(FitacityContract.ExerciseEntry.buildExerciseUriWithId(exercise.getId()),
                             null,
                             null);
+
+                    // Send Google Analytics event to dislike the shown exercise
+                    mTracker.send(new HitBuilders.EventBuilder()
+                            .setCategory("Action")
+                            .setAction("Disliked:" + exercise.getName())
+                            .build());
                 }
             }
         });

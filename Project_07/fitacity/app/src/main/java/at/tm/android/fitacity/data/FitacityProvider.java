@@ -190,8 +190,8 @@ public class FitacityProvider extends ContentProvider {
         if (numRowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
 
-            // Send broadcast to inform widgets,... to update views
-            Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
+            Intent dataUpdatedIntent = new Intent();
+            dataUpdatedIntent.setAction(ACTION_DATA_UPDATED);
             getContext().sendBroadcast(dataUpdatedIntent);
         }
 
@@ -237,11 +237,12 @@ public class FitacityProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+
         getContext().getContentResolver().notifyChange(uri, null);
 
         // Send broadcast to inform widgets,... to update views
         Intent dataUpdatedIntent = new Intent();
-        dataUpdatedIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        dataUpdatedIntent.setAction(ACTION_DATA_UPDATED);
         getContext().sendBroadcast(dataUpdatedIntent);
         return returnUri;
     }
