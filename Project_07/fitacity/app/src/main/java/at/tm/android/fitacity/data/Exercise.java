@@ -30,7 +30,7 @@ public class Exercise implements Parcelable {
         this.imgUrl = imgUrl;
     }
 
-    protected Exercise(Parcel in) {
+    private Exercise(Parcel in) {
         id = in.readInt();
         name = in.readString();
         description = in.readString();

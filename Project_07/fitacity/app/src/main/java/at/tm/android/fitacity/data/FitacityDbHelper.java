@@ -7,15 +7,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Manages a local database for fitacity data.
  */
-public class FitacityDbHelper extends SQLiteOpenHelper {
+class FitacityDbHelper extends SQLiteOpenHelper {
 
     // Name of the local SQLite database
-    public static final String DATABASE_NAME = "fitacity.db";
+    private static final String DATABASE_NAME = "fitacity.db";
 
     // Increase version when changing the database schema
     private static final int DATABASE_VERSION = 2;
 
-    public FitacityDbHelper(Context context) {
+    FitacityDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

@@ -75,7 +75,7 @@ public class FitacityProvider extends ContentProvider {
     /**
      * Method to insert multiple movies to the database
      *
-     * @param uri - URI for the insert operation
+     * @param uri    - URI for the insert operation
      * @param values - values to insert to the database
      * @return - number of inserted rows
      */
@@ -88,18 +88,18 @@ public class FitacityProvider extends ContentProvider {
      * Method to get data from the database based on a selection string and selection arguments.
      * Furthermore there is a possibility to order the items by condition.
      *
-     * @param uri - URI for the query operation
-     * @param projection - Elements to get from the database scheme
-     * @param selection - Selection for the query
+     * @param uri           - URI for the query operation
+     * @param projection    - Elements to get from the database scheme
+     * @param selection     - Selection for the query
      * @param selectionArgs - Selection arguments to filter data
-     * @param sortOrder - Sort order to sort the items
+     * @param sortOrder     - Sort order to sort the items
      * @return - a cursor to handle the requested data items
      */
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
-        Cursor cursor = null;
+        Cursor cursor;
 
         // Switch statement to decide wich query shoud be executed
         switch (sUriMatcher.match(uri)) {
@@ -129,7 +129,7 @@ public class FitacityProvider extends ContentProvider {
                         // Only get items with the specified ID (only one exercise)
                         FitacityContract.ExerciseEntry.COLUMN_ID + " = ? ",
                         // Read the id to filter from the URI
-                        new String[] {String.valueOf(ContentUris.parseId(uri))},
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
                         null,
                         null,
                         sortOrder);
@@ -170,7 +170,7 @@ public class FitacityProvider extends ContentProvider {
                         // Only remove item with the specified ID (only one movie)
                         FitacityContract.ExerciseEntry.COLUMN_ID + " = ? ",
                         // Read the id to filter from the URI
-                        new String[] {String.valueOf(ContentUris.parseId(uri))});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
 
                 break;
 
@@ -212,7 +212,7 @@ public class FitacityProvider extends ContentProvider {
     /**
      * Method to insert a movie to the database
      *
-     * @param uri - URI for the insert operation
+     * @param uri    - URI for the insert operation
      * @param values - values to insert the movie to the database
      * @return - uri for the inserted movie
      */
@@ -228,7 +228,7 @@ public class FitacityProvider extends ContentProvider {
 
                 // insert unless it is already contained in the database
                 if (id > 0) {
-                    returnUri = FitacityContract.ExerciseEntry.buildExerciseUriWithId((int)id);
+                    returnUri = FitacityContract.ExerciseEntry.buildExerciseUriWithId((int) id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into: " + uri);
                 }

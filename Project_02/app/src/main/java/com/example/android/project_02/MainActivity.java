@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String MOVIE_LIST_KEY = "movieList";
     private static final String SORT_CRITERIA_KEY = "sortCriteria";
+    private static final int FAVORITE_EXERCISE_LOADER = 0;
 
     private MovieRecyclerViewAdapter mMovieAdapter;
 

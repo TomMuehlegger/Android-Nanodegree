@@ -17,13 +17,18 @@
 
 <resources>
 
-    <style name="Theme.DesignDemo" parent="Base.Theme.DesignDemo">
+    <!--style name="Theme.DesignDemo" parent="Base.Theme.DesignDemo">
     </style>
 
     <style name="Base.Theme.DesignDemo" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">#673AB7</item>
         <item name="colorPrimaryDark">#512DA8</item>
         <item name="colorAccent">#FF4081</item>
+    </style-->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="Widget.CardContent" parent="android:Widget">
@@ -32,27 +37,6 @@
         <item name="android:paddingTop">24dp</item>
         <item name="android:paddingBottom">24dp</item>
         <item name="android:orientation">vertical</item>
-    </style>
-
-    <style name="AppTheme" parent="Theme.AppCompat">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="PercentChangeTextStyle">
-        <item name="android:textSize">20sp</item>
-        <item name="android:textColor">#FFF</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="BidPriceTextStyle">
-        <item name="android:textSize">20sp</item>
-    </style>
-
-    <style name="StockSymbolTextStyle">
-        <item name="android:textSize">25sp</item>
-        <item name="android:textAllCaps">true</item>
     </style>
 
 </resources>

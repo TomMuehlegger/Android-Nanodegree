@@ -11,26 +11,20 @@ import android.provider.BaseColumns;
 public class FitacityContract {
 
     // Main package of the content provider
-    public static final String CONTENT_AUTHORITY = "at.tm.android.fitacity";
+    static final String CONTENT_AUTHORITY = "at.tm.android.fitacity";
 
     // Use CONTENT_AUTHORITY to create the base of all URI's which apps will use to contact
     // the content provider for project_02.
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     // Paths to the fitacity content providers
-    public static final String PATH_CATEGORY = "category";
-    public static final String PATH_EXERCISE = "exercise";
+    private static final String PATH_CATEGORY = "category";
+    static final String PATH_EXERCISE = "exercise";
 
     // Inner class that defines the table contents of the category table
     public static final class CategoryEntry implements BaseColumns {
-
-        // The base CONTENT_URI used to query the category table from the content provider
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_CATEGORY)
-                .build();
-
         // Used internally as the name of our movie table.
-        public static final String TABLE_NAME = "category";
+        static final String TABLE_NAME = "category";
 
         // Name of the ID column
         public static final String COLUMN_ID = "id";
@@ -51,7 +45,7 @@ public class FitacityContract {
                 .build();
 
         // Used internally as the name of our movie table.
-        public static final String TABLE_NAME = "exercise";
+        static final String TABLE_NAME = "exercise";
 
         // Name of the ID column
         public static final String COLUMN_ID = "id";
@@ -71,7 +65,7 @@ public class FitacityContract {
         public static final String COLUMN_IMG_URL = "img_url";
 
         // for building URIs on insertion
-        public static Uri buildExerciseUriWithId(int id){
+        public static Uri buildExerciseUriWithId(int id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

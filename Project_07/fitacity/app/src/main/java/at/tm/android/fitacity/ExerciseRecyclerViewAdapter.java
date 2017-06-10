@@ -13,7 +13,6 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import at.tm.android.fitacity.data.Exercise;
 import at.tm.android.fitacity.utilities.CircleTransform;
@@ -58,6 +57,7 @@ public class ExerciseRecyclerViewAdapter extends RecyclerView.Adapter<ExerciseRe
     public void updateExerciseData(List<Exercise> exercises) {
         mExercises.clear();
         mExercises.addAll(exercises);
+
         notifyDataSetChanged();
     }
 

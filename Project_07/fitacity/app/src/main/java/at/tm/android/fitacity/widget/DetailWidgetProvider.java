@@ -33,11 +33,7 @@ public class DetailWidgetProvider extends AppWidgetProvider {
             views.setOnClickPendingIntent(R.id.widget_title, pendingIntent);
 
             // Set up the collection
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                setRemoteAdapter(context, views);
-            } else {
-                setRemoteAdapterV11(context, views);
-            }
+            setRemoteAdapter(context, views);
 
             views.setEmptyView(R.id.widget_list, R.id.widget_error);
 
@@ -73,17 +69,5 @@ public class DetailWidgetProvider extends AppWidgetProvider {
         Intent intent = new Intent(context, DetailWidgetRemoteViewsService.class);
 
         views.setRemoteAdapter(R.id.widget_list, intent);
-    }
-
-    /**
-     * Sets the remote adapter used to fill in the list items
-     *
-     * @param views RemoteViews to set the RemoteAdapter
-     */
-    @SuppressWarnings("deprecation")
-    private void setRemoteAdapterV11(Context context, @NonNull final RemoteViews views) {
-        Intent intent = new Intent(context, DetailWidgetRemoteViewsService.class);
-
-        views.setRemoteAdapter(0, R.id.widget_list, intent);
     }
 }

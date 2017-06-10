@@ -21,8 +21,8 @@ public final class FitacityJsonUtils {
      *
      * @param categoryDataJsonString json string representing category data
      * @return list of categories
-     * @throws JSONException
-     * @throws ParseException
+     * @throws JSONException  - thrown when not a valid json
+     * @throws ParseException - thrown when parsing failed
      */
     public static ArrayList<Category> getCategoryDataFromJson(String categoryDataJsonString) throws JSONException, ParseException {
 
@@ -52,8 +52,8 @@ public final class FitacityJsonUtils {
      *
      * @param exerciseDataJsonString json string representing exercise data
      * @return list of exercises
-     * @throws JSONException
-     * @throws ParseException
+     * @throws JSONException  - thrown when not a valid json
+     * @throws ParseException - thrown when parsing failed
      */
     public static ArrayList<Exercise> getExerciseDataFromJson(String exerciseDataJsonString) throws JSONException, ParseException {
 

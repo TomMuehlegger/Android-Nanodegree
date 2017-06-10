@@ -1,45 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Layout for the widget detail
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:id="@+id/widget"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_action_bar_default_height_material"
         android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/widget_detail_title_height"
         android:background="@color/colorPrimary">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:contentDescription="@string/widget_title"
-            android:textAppearance="@android:style/TextAppearance.Inverse"
             android:text="@string/widget_title"
+            android:textAppearance="@android:style/TextAppearance.Inverse"
             tools:text="@string/widget_title" />
     </FrameLayout>
+
     <FrameLayout
+        android:id="@+id/widget_list_parent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:id="@+id/widget_list_parent"
         android:background="@color/cardview_light_background">
+
+        <TextView
+            android:id="@+id/widget_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/detail_activity_padding_medium"
+            android:contentDescription="@string/no_favorite_exercises"
+            android:text="@string/no_favorite_exercises"
+            tools:text="@string/no_favorite_exercises" />
+
         <ListView
             android:id="@+id/widget_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:divider="@null"
             android:dividerHeight="0dp"
-            tools:listitem="@layout/list_item"/>
-        <TextView
-            android:id="@+id/widget_error"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textAppearance="@android:style/TextAppearance.Medium"
-            android:visibility="visible"
-            tools:text="@string/error_no_network" />
+            tools:listitem="@layout/list_item" />
     </FrameLayout>
 
 </LinearLayout>

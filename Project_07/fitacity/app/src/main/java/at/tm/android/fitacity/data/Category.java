@@ -22,7 +22,7 @@ public class Category implements Parcelable {
         this.mainCategory = mainCategory;
     }
 
-    protected Category(Parcel in) {
+    private Category(Parcel in) {
         id = in.readInt();
         name = in.readString();
         description = in.readString();
@@ -41,7 +41,7 @@ public class Category implements Parcelable {
         return description;
     }
 
-    public int getMainCategory() {
+    private int getMainCategory() {
         return mainCategory;
     }
 

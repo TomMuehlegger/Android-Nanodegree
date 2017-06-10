@@ -16,22 +16,23 @@
 
 package at.tm.android.fitacity;
 
-import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -44,18 +45,21 @@ import java.util.Map;
 
 import at.tm.android.fitacity.data.Category;
 import at.tm.android.fitacity.data.Exercise;
+import at.tm.android.fitacity.data.ExerciseLoader;
 import at.tm.android.fitacity.data.FitacityContract;
 import at.tm.android.fitacity.utilities.FitacityJsonUtils;
 import at.tm.android.fitacity.utilities.NetworkUtils;
 
 /**
- * TODO
+ * MainActivity providing a list of exercises (favorites or of a specified category)
  */
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private DrawerLayout mDrawerLayout;
     private Map<Integer, Category> mCategoryMenuMap;
     private ExerciseRecyclerViewAdapter mExerciseRecyclerViewAdapter;
+    private TextView mEmptyRecyclerView;
     private NavigationView mNavigationView;
     private int mSelectedCategoryId;
 
@@ -96,10 +100,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerview);
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
 
+        mEmptyRecyclerView = (TextView) findViewById(R.id.tvEmptyRecylcerView);
+
         if ((savedInstanceState != null) &&
-            (savedInstanceState.containsKey(EXERCISE_LIST_KEY)) &&
-            (savedInstanceState.containsKey(SELECTED_CATEGORY_ID_KEY)) &&
-            (savedInstanceState.containsKey(SELECTED_CATEGORY_ID_KEY))) {
+                (savedInstanceState.containsKey(EXERCISE_LIST_KEY)) &&
+                (savedInstanceState.containsKey(SELECTED_CATEGORY_ID_KEY)) &&
+                (savedInstanceState.containsKey(SELECTED_CATEGORY_ID_KEY))) {
 
             // Set the selected category id
             mSelectedCategoryId = savedInstanceState.getInt(SELECTED_CATEGORY_ID_KEY);
@@ -108,14 +114,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             List<Category> previousCategoryList = savedInstanceState.getParcelableArrayList(CATEGORY_LIST_KEY);
             setCategoriesMenu(previousCategoryList);
 
+            System.out.println("Saved exercises");
+
             // Set the stored exercise list to the recycler view adapter
             mExerciseRecyclerViewAdapter = new ExerciseRecyclerViewAdapter();
 
             if (mSelectedCategoryId == FAVORITE_CATEGORY_ID) {
                 // Set the favorite exercises evertime the favorite category is selected
-                setExerciseData(getFavoriteExercises());
-            }
-            else {
+                getSupportLoaderManager().initLoader(FAVORITE_CATEGORY_ID, null, this);
+            } else {
                 // If there is a previous exercise list stored, update the exercise list adapter
                 List<Exercise> previousExerciseList = savedInstanceState.getParcelableArrayList(EXERCISE_LIST_KEY);
                 setExerciseData(previousExerciseList);
@@ -129,7 +136,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             new FetchCategoryDataTask().execute();
 
             // load the favorite exercises and put it into the recycler view adapter
-            mExerciseRecyclerViewAdapter = new ExerciseRecyclerViewAdapter(getFavoriteExercises());
+            mExerciseRecyclerViewAdapter = new ExerciseRecyclerViewAdapter();
+            getSupportLoaderManager().initLoader(FAVORITE_CATEGORY_ID, null, this);
         }
 
         // Set the adapter to the recycler view
@@ -141,7 +149,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
 
         if (mSelectedCategoryId == FAVORITE_CATEGORY_ID) {
-            setExerciseData(getFavoriteExercises());
+            getSupportLoaderManager().initLoader(FAVORITE_CATEGORY_ID, null, this);
+        }
+        else {
+            new FetchExerciseDataTask().execute(mSelectedCategoryId);
         }
     }
 
@@ -167,53 +178,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    private List<Exercise> getFavoriteExercises() {
-        final ContentResolver resolver = getContentResolver();
-        String[] projectionColumns = {
-                FitacityContract.ExerciseEntry.COLUMN_ID,
-                FitacityContract.ExerciseEntry.COLUMN_NAME,
-                FitacityContract.ExerciseEntry.COLUMN_DESCRIPTION,
-                FitacityContract.ExerciseEntry.COLUMN_CATEGORY,
-                FitacityContract.ExerciseEntry.COLUMN_EQUIPMENT,
-                FitacityContract.ExerciseEntry.COLUMN_DIFFICULTY,
-                FitacityContract.ExerciseEntry.COLUMN_VIDEO_URL,
-                FitacityContract.ExerciseEntry.COLUMN_IMG_URL
-        };
-
-        Cursor cursor = resolver.query(FitacityContract.ExerciseEntry.CONTENT_URI,
-                projectionColumns,
-                null,
-                null,
-                null);
-
-        List<Exercise> exercises = new ArrayList<>();
-
-        while (cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_ID));
-            String name = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_NAME));
-            String description = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_DESCRIPTION));
-            int category = cursor.getInt(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_CATEGORY));
-            String equipment = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_EQUIPMENT));
-            float difficulty = cursor.getFloat(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_DIFFICULTY));
-            String videoUrl = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_VIDEO_URL));
-            String imgUrl = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_IMG_URL));
-
-            exercises.add(new Exercise(id, name, description, category, equipment, difficulty, videoUrl, imgUrl));
-        }
-
-        return exercises;
-    }
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
 
         if (itemId == FAVORITE_CATEGORY_ID) {
             mSelectedCategoryId = FAVORITE_CATEGORY_ID;
-            setExerciseData(getFavoriteExercises());
+            getSupportLoaderManager().initLoader(FAVORITE_CATEGORY_ID, null, this);
         } else {
             // A category selected
             Category selectedCategory = mCategoryMenuMap.get(itemId);
+
+            System.out.println("OnNavigationItemSelected");
 
             if (selectedCategory != null) {
                 mSelectedCategoryId = selectedCategory.getId();
@@ -226,71 +202,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    public class FetchCategoryDataTask extends AsyncTask<Void, Void, List<Category>> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Show the loading indicator
-            // TODO: Show the loading indicator
-        }
-
-        @Override
-        protected List<Category> doInBackground(Void... params) {
-
-            // Build url to get the category data
-            URL categoryDataRequestUrl = NetworkUtils.buildUrl();
-
-            try {
-                String jsonCategoryDataResponse = NetworkUtils.getResponseFromHttpUrl(categoryDataRequestUrl);
-
-                // Parse categories from json response string
-                return FitacityJsonUtils.getCategoryDataFromJson(jsonCategoryDataResponse);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<Category> categories) {
-            // Set the category data to the menu
-            setCategoriesMenu(categories);
-        }
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return ExerciseLoader.newAllExercisesInstance(this);
     }
 
-    public class FetchExerciseDataTask extends AsyncTask<Integer, Void, List<Exercise>> {
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        List<Exercise> exercises = new ArrayList<>();
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Show the loading indicator
+        // To start from the beginning every time
+        cursor.moveToFirst();
+        cursor.moveToPrevious();
+
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_ID));
+            String name = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_NAME));
+            String description = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_DESCRIPTION));
+            int category = cursor.getInt(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_CATEGORY));
+            String equipment = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_EQUIPMENT));
+            float difficulty = cursor.getFloat(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_DIFFICULTY));
+            String videoUrl = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_VIDEO_URL));
+            String imgUrl = cursor.getString(cursor.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_IMG_URL));
+
+            // Get all exercises from the cursor and put them to the exercise list
+            exercises.add(new Exercise(id, name, description, category, equipment, difficulty, videoUrl, imgUrl));
         }
 
-        @Override
-        protected List<Exercise> doInBackground(Integer... params) {
-
-            // Build url to get the category data
-            URL exerciseDataRequestUrl = NetworkUtils.buildExerciseUrl(params[0]);
-
-            try {
-                String jsonExerciseDataResponse = NetworkUtils.getResponseFromHttpUrl(exerciseDataRequestUrl);
-
-                // Parse exercises from json response string
-                return FitacityJsonUtils.getExerciseDataFromJson(jsonExerciseDataResponse);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
+        if (exercises.size() > 0) {
+            mEmptyRecyclerView.setVisibility(View.INVISIBLE);
+        }
+        else {
+            mEmptyRecyclerView.setVisibility(View.VISIBLE);
         }
 
-        @Override
-        protected void onPostExecute(List<Exercise> exercises) {
-            // Set the category data to the menu
-            setExerciseData(exercises);
-        }
+        mExerciseRecyclerViewAdapter.updateExerciseData(exercises);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        mExerciseRecyclerViewAdapter.updateExerciseData(new ArrayList<Exercise>());
     }
 
     /**
@@ -336,6 +287,76 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (exercises != null) {
             // Update the exercise data
             mExerciseRecyclerViewAdapter.updateExerciseData(exercises);
+
+            if (exercises.size() > 0) {
+                mEmptyRecyclerView.setVisibility(View.INVISIBLE);
+            }
+            else {
+                mEmptyRecyclerView.setVisibility(View.VISIBLE);
+            }
+        }
+        else {
+            mEmptyRecyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /**
+     * Class to fecth the category data
+     */
+    private class FetchCategoryDataTask extends AsyncTask<Void, Void, List<Category>> {
+
+        @Override
+        protected List<Category> doInBackground(Void... params) {
+
+            // Build url to get the category data
+            URL categoryDataRequestUrl = NetworkUtils.buildUrl();
+
+            try {
+                String jsonCategoryDataResponse = NetworkUtils.getResponseFromHttpUrl(categoryDataRequestUrl);
+
+                // Parse categories from json response string
+                return FitacityJsonUtils.getCategoryDataFromJson(jsonCategoryDataResponse);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<Category> categories) {
+            // Set the category data to the menu
+            setCategoriesMenu(categories);
+        }
+    }
+
+    /**
+     * Task to fetch the exercise data
+     */
+    private class FetchExerciseDataTask extends AsyncTask<Integer, Void, List<Exercise>> {
+
+        @Override
+        protected List<Exercise> doInBackground(Integer... params) {
+
+            // Build url to get the category data
+            URL exerciseDataRequestUrl = NetworkUtils.buildExerciseUrl(params[0]);
+
+            try {
+                String jsonExerciseDataResponse = NetworkUtils.getResponseFromHttpUrl(exerciseDataRequestUrl);
+
+                // Parse exercises from json response string
+                return FitacityJsonUtils.getExerciseDataFromJson(jsonExerciseDataResponse);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<Exercise> exercises) {
+            // Set the category data to the menu
+            setExerciseData(exercises);
         }
     }
 }

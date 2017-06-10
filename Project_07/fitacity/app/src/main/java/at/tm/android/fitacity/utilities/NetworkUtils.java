@@ -64,7 +64,7 @@ public final class NetworkUtils {
      *
      * @param url The URL to get the HTTP response from.
      * @return content of the HTTP request
-     * @throws IOException
+     * @throws IOException - On failing input stream
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

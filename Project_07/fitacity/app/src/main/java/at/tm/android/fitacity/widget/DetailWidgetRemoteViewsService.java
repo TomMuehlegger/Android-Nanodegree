@@ -79,8 +79,11 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 String videoUrl = data.getString(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_VIDEO_URL));
                 String imgUrl = data.getString(data.getColumnIndex(FitacityContract.ExerciseEntry.COLUMN_IMG_URL));
 
+                // Set the name and image of the exercise including the content description
                 row.setTextViewText(R.id.name, name);
+                row.setContentDescription(R.id.name, getString(R.string.a11y_list_item_exercise_name, name));
                 row.setImageViewResource(R.id.avatar, R.drawable.ic_favorite);
+                row.setContentDescription(R.id.avatar, getString(R.string.a11y_list_item_img, name));
 
                 // Add fill in intent to launch the exercise activity when clicking an favorite exercise
                 Exercise exercise = new Exercise(id, name, description, category, equipment, difficulty, videoUrl, imgUrl);

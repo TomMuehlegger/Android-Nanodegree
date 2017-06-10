@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package at.tm.android.fitacity;
 
 import android.content.ContentResolver;
@@ -41,6 +25,9 @@ import at.tm.android.fitacity.data.Exercise;
 import at.tm.android.fitacity.data.FitacityContract;
 import at.tm.android.fitacity.utilities.AnalyticsApplication;
 
+/**
+ * Exercise detail activity providing details about an exercise
+ */
 public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
 
     public static final String EXERCISE_EXTRA_NAME = "exercise";
@@ -63,7 +50,7 @@ public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTu
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        fav_fab = (FloatingActionButton)findViewById(R.id.fav_fab);
+        fav_fab = (FloatingActionButton) findViewById(R.id.fav_fab);
 
         // Obtain the shared Tracker instance for Google Analytics
         AnalyticsApplication application = (AnalyticsApplication) getApplication();
@@ -155,7 +142,7 @@ public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTu
 
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean wasRestored) {
-        if(youTubePlayer == null) {
+        if (youTubePlayer == null) {
             return;
         }
 
