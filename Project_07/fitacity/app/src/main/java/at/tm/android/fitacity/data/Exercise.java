@@ -36,7 +36,7 @@ public class Exercise implements Parcelable {
         description = in.readString();
         category = in.readInt();
         equipment = in.readString();
-        difficulty = in.readInt();
+        difficulty = in.readFloat();
         videoUrl = in.readString();
         imgUrl = in.readString();
     }

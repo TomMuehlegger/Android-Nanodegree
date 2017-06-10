@@ -13,7 +13,7 @@ class FitacityDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "fitacity.db";
 
     // Increase version when changing the database schema
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     FitacityDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -52,7 +52,7 @@ class FitacityDbHelper extends SQLiteOpenHelper {
                 FitacityContract.ExerciseEntry.COLUMN_DESCRIPTION   + " TEXT," +
                 FitacityContract.ExerciseEntry.COLUMN_CATEGORY      + " INTEGER NOT NULL," +
                 FitacityContract.ExerciseEntry.COLUMN_EQUIPMENT     + " TEXT," +
-                FitacityContract.ExerciseEntry.COLUMN_DIFFICULTY    + " INTEGER," +
+                FitacityContract.ExerciseEntry.COLUMN_DIFFICULTY    + " FLOAT," +
                 FitacityContract.ExerciseEntry.COLUMN_VIDEO_URL     + " TEXT," +
                 FitacityContract.ExerciseEntry.COLUMN_IMG_URL       + " TEXT);";
 
