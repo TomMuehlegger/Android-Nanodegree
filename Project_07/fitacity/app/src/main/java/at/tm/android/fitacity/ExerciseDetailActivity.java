@@ -69,9 +69,11 @@ public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTu
         if (cursor.moveToFirst()) {
             this.exerciseIsFavorite = true;
             fav_fab.setImageResource(R.drawable.ic_favorite);
+            fav_fab.setContentDescription(getString(R.string.detail_activity_fab_remove_content_description));
         } else {
             this.exerciseIsFavorite = false;
             fav_fab.setImageResource(R.drawable.ic_unfavorite);
+            fav_fab.setContentDescription(getString(R.string.detail_activity_fab_add_content_description));
         }
 
         fav_fab.setOnClickListener(new View.OnClickListener() {
@@ -97,8 +99,8 @@ public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTu
 
                     // Send Google Analytics event to like the shown exercise
                     mTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Action")
-                            .setAction("Liked:" + exercise.getName())
+                            .setCategory(getString(R.string.analytics_action))
+                            .setAction(getString(R.string.analytics_action_liked) + exercise.getName())
                             .build());
                 } else {
                     //Add icon
@@ -111,8 +113,8 @@ public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTu
 
                     // Send Google Analytics event to dislike the shown exercise
                     mTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Action")
-                            .setAction("Disliked:" + exercise.getName())
+                            .setCategory(getString(R.string.analytics_action))
+                            .setAction(getString(R.string.analytics_action_disliked) + exercise.getName())
                             .build());
                 }
             }
@@ -155,6 +157,6 @@ public class ExerciseDetailActivity extends YouTubeBaseActivity implements YouTu
 
     @Override
     public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-        Toast.makeText(this, "Failed to initialize." + youTubeInitializationResult.toString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.youtube_init_failed) + youTubeInitializationResult.toString(), Toast.LENGTH_LONG).show();
     }
 }

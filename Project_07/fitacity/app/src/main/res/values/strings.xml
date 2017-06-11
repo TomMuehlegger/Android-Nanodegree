@@ -16,6 +16,8 @@
     <string name="a11y_list_item_exercise_name">Exercise name: %s</string>
     <string name="a11y_list_item_img">Image for : %s</string>
 
+    <string name="detail_activity_fab_add_content_description">Mark exercise as favorite button</string>
+    <string name="detail_activity_fab_remove_content_description">Remove exercise from favorites button</string>
     <string name="detail_activity_img_content_description">Image describing the exercise</string>
     <string name="detail_activity_description">Description</string>
     <string name="detail_activity_video">Video</string>
@@ -24,6 +26,11 @@
     <string name="detail_activity_difficulty">Difficulty:</string>
 
     <string name="no_exercises">No exercises found</string>
+    <string name="youtube_init_failed">Failed to initialize.</string>
+
+    <string name="analytics_action">Action</string>
+    <string name="analytics_action_liked">Liked:</string>
+    <string name="analytics_action_disliked">Disliked:</string>
 
     <string name="no_favorite_exercises">No favorite exercises found!</string>
 
